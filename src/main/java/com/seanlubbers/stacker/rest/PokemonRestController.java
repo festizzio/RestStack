@@ -70,11 +70,7 @@ public class PokemonRestController {
     @GetMapping("/pokemon/stack")
     public List<PokemonReward> getStack() {
         List<PokemonReward> pokemonRewards = pokemonRewardService.getRewards();
-//        pokemonRewards.forEach(PokemonReward::calculateIvPercentagePerCP);
         return pokemonRewards;
     }
 
-    // charmander 390
-    // charmander 392
-    // charmander 394
 }
