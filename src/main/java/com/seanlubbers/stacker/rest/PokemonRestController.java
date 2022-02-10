@@ -69,8 +69,7 @@ public class PokemonRestController {
 
     @GetMapping("/pokemon/stack")
     public List<PokemonReward> getStack() {
-        List<PokemonReward> pokemonRewards = pokemonRewardService.getRewards();
-        return pokemonRewards;
+        return pokemonRewardService.getRewards();
     }
 
 }

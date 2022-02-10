@@ -2,6 +2,7 @@ package com.seanlubbers.stacker.model;
 
 import com.seanlubbers.stacker.rest.InvalidCpException;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.*;
 
@@ -37,6 +38,10 @@ public class PokemonReward {
 
     // == constructors ==
 
+    // So JPA will call the empty, default constructor when it loads the entities from the table.
+    // Putting anything in here will throw an error, so if you need to do any post-processing on
+    // the loaded entity, you need to use the @PostLoad annotation. @PostConstruct doesn't work
+    // because JPA does not work with the Spring container/beans.
     public PokemonReward() {
 
     }
@@ -83,6 +88,15 @@ public class PokemonReward {
             this.CP = calculateCP(15, 15, 15);
         }
 
+        calculateIvPercentagePerCP();
+    }
+
+    @PostLoad
+    public void init() {
+        possibleCPValues = new ArrayList<>();
+        mapOfIvValues = new HashMap<>();
+        calculatePossibleCPValues();
+        possibleCPValues.sort(Comparator.naturalOrder());
         calculateIvPercentagePerCP();
     }
 
