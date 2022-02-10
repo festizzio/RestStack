@@ -28,11 +28,11 @@ public class PokemonReward {
     private String ivValuesPerCp;
 
     @Transient
-    private List<Integer> possibleCPValues;
+    private List<Integer> possibleCPValues = new ArrayList<>();
     @Transient
     private int stardustValue;
     @Transient
-    private Map<Integer, List<IvValues>> mapOfIvValues;
+    private Map<Integer, List<IvValues>> mapOfIvValues = new HashMap<>();
     @Transient
     private static List<IvValues> ivList = calculateListOfIVs();
 
@@ -65,8 +65,6 @@ public class PokemonReward {
         this.baseAttack = baseAttack;
         this.baseDefense = baseDefense;
         this.baseStamina = baseStamina;
-        possibleCPValues = new ArrayList<>();
-        mapOfIvValues = new HashMap<>();
         calculatePossibleCPValues();
         possibleCPValues.sort(Comparator.naturalOrder());
 
@@ -93,8 +91,6 @@ public class PokemonReward {
 
     @PostLoad
     public void init() {
-        possibleCPValues = new ArrayList<>();
-        mapOfIvValues = new HashMap<>();
         calculatePossibleCPValues();
         possibleCPValues.sort(Comparator.naturalOrder());
         calculateIvPercentagePerCP();
