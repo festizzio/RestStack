@@ -28,13 +28,9 @@ public class PokemonReward {
     private String ivValuesPerCp;
 
     @Transient
-    private List<Integer> possibleCPValues = new ArrayList<>();
-    @Transient
     private int stardustValue;
     @Transient
     private Map<Integer, List<IvValues>> mapOfIvValues = new HashMap<>();
-    @Transient
-    private static List<IvValues> ivList = calculateListOfIVs();
 
     // == constructors ==
 
@@ -50,14 +46,6 @@ public class PokemonReward {
         this(pokemon.getPokedex(), pokemon.getName(), pokemon.getAttack(), pokemon.getDefense(), pokemon.getStamina(), CP);
     }
 
-    public PokemonReward(int pokedexNumber, String pokemonName, int baseAttack, int baseDefense, int baseStamina) {
-        this.pokedexNumber = pokedexNumber;
-        this.pokemonName = pokemonName;
-        this.baseAttack = baseAttack;
-        this.baseDefense = baseDefense;
-        this.baseStamina = baseStamina;
-    }
-
     public PokemonReward(int pokedexNumber, String pokemonName, int baseAttack, int baseDefense, int baseStamina, int CP) {
 
         this.pokedexNumber = pokedexNumber;
@@ -65,8 +53,7 @@ public class PokemonReward {
         this.baseAttack = baseAttack;
         this.baseDefense = baseDefense;
         this.baseStamina = baseStamina;
-        calculatePossibleCPValues();
-        possibleCPValues.sort(Comparator.naturalOrder());
+        this.CP = CP;
 
         // == initialize list of evolved Pokemon - these are worth extra stardust ==
         final List<String> stage1EvoName = Arrays.asList("Graveler", "Rhydon", "Poliwhirl", "Monferno",
@@ -80,19 +67,11 @@ public class PokemonReward {
             stardustValue = 100;
         }
 
-        if(CP > 0) {
-            this.CP = CP;
-        } else {
-            this.CP = calculateCP(15, 15, 15);
-        }
-
         calculateIvPercentagePerCP();
     }
 
     @PostLoad
     public void init() {
-        calculatePossibleCPValues();
-        possibleCPValues.sort(Comparator.naturalOrder());
         calculateIvPercentagePerCP();
     }
 
@@ -102,7 +81,7 @@ public class PokemonReward {
     private void calculatePossibleCPValues() {
         int CP;
         List<IvValues> listOfIvValues;
-        for(IvValues currentIVs : ivList) {
+        for(IvValues currentIVs : Pokemon.getIvList()) {
 
             CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
             listOfIvValues = new ArrayList<>();
@@ -118,7 +97,6 @@ public class PokemonReward {
             listOfIvValues.sort(Comparator.comparingDouble(IvValues::getIvPercentage));
             mapOfIvValues.put(CP, listOfIvValues);
         }
-        fillPossibleCPValueList();
     }
 
     private int calculateCP(int attackIV, int defenseIV, int staminaIV) {
@@ -127,11 +105,6 @@ public class PokemonReward {
         // https://gamepress.gg/pokemongo/cp-multiplier
         return (int) ((baseAttack + attackIV) * Math.pow((baseDefense + defenseIV), 0.5) *
                 Math.pow((baseStamina + staminaIV), 0.5) * Math.pow(0.51739395, 2)) / 10;
-    }
-
-    private void fillPossibleCPValueList(){
-        possibleCPValues.addAll(mapOfIvValues.keySet());
-        possibleCPValues.sort(Comparator.naturalOrder());
     }
 
     // For each CP, there are several different possibilities for IV percentages. This sets the range.
@@ -167,10 +140,6 @@ public class PokemonReward {
         return CP;
     }
 
-    public List<Integer> getPossibleCPValues() {
-        return possibleCPValues;
-    }
-
     public int getPokedexNumber() {
         return this.pokedexNumber;
     }
@@ -200,21 +169,5 @@ public class PokemonReward {
     @Override
     public String toString() {
         return this.pokemonName + ": CP " + this.CP;
-    }
-
-    // == static methods ==
-
-    // IV floor for research tasks is 10/10/10, and these values don't change between Pokemon.
-    // No reason to call it every time you instantiate a new Pokemon object hence it being static.
-    private static List<IvValues> calculateListOfIVs() {
-        List<IvValues> ivValues = new ArrayList<>();
-        for(int attackIV = 10; attackIV <= 15; attackIV++) {
-            for (int defenseIV = 10; defenseIV <= 15; defenseIV++) {
-                for (int staminaIV = 10; staminaIV <= 15; staminaIV++) {
-                    ivValues.add(new IvValues(attackIV, defenseIV, staminaIV));
-                }
-            }
-        }
-        return ivValues;
     }
 }

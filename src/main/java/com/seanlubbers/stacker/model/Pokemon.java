@@ -3,6 +3,8 @@ package com.seanlubbers.stacker.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.util.*;
 
 @Entity
 @Table(name="pokemon")
@@ -15,6 +17,12 @@ public class Pokemon {
     @Id
     private String name;
 
+    @Transient
+    private Set<Integer> possibleCP = new TreeSet<>();
+
+    @Transient
+    private static List<IvValues> ivList = calculateListOfIVs();
+
     public Pokemon() {
 
     }
@@ -25,6 +33,7 @@ public class Pokemon {
         this.stamina = stamina;
         this.pokedex = pokedex;
         this.name = name;
+        calculatePossibleCPValues();
     }
 
     public int getAttack() {
@@ -47,6 +56,27 @@ public class Pokemon {
         return name;
     }
 
+    // Calculate the list of possible CP values for this Pokemon based on level 15 with any of the IV values given.
+    private void calculatePossibleCPValues() {
+        int CP;
+        for(IvValues currentIVs : ivList) {
+            CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
+            possibleCP.add(CP);
+        }
+    }
+
+    private int calculateCP(int attackIV, int defenseIV, int staminaIV) {
+        // Formula to calculate the CP of a Pokemon based on its known IVs and level per gamepress.gg.
+        // The arbitrary CP multiplier for level 15 (the level of all research rewards) is 0.51739395.
+        // https://gamepress.gg/pokemongo/cp-multiplier
+        return (int) ((attack + attackIV) * Math.pow((defense + defenseIV), 0.5) *
+                Math.pow((stamina + staminaIV), 0.5) * Math.pow(0.51739395, 2)) / 10;
+    }
+
+    public Set<Integer> getPossibleCPValues() {
+        return possibleCP;
+    }
+
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -65,5 +95,25 @@ public class Pokemon {
         return pokedex + ". " +
                 name + ": " +
                 attack + ", " + defense + ", " + stamina;
+    }
+
+    // == static methods ==
+
+    // IV floor for research tasks is 10/10/10, and these values don't change between Pokemon.
+    // No reason to call it every time you instantiate a new Pokemon object hence it being static.
+    private static List<IvValues> calculateListOfIVs() {
+        List<IvValues> ivValues = new ArrayList<>();
+        for(int attackIV = 10; attackIV <= 15; attackIV++) {
+            for (int defenseIV = 10; defenseIV <= 15; defenseIV++) {
+                for (int staminaIV = 10; staminaIV <= 15; staminaIV++) {
+                    ivValues.add(new IvValues(attackIV, defenseIV, staminaIV));
+                }
+            }
+        }
+        return ivValues;
+    }
+
+    public static List<IvValues> getIvList() {
+        return ivList;
     }
 }
