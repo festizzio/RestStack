@@ -1,6 +1,7 @@
 package com.seanlubbers.stacker.model;
 
 import com.seanlubbers.stacker.rest.InvalidCpException;
+import com.seanlubbers.stacker.utils.StardustValues;
 
 import javax.persistence.*;
 import java.util.*;
@@ -59,13 +60,9 @@ public class PokemonReward {
         this.baseStamina = baseStamina;
         this.CP = CP;
 
-        // == initialize list of evolved Pokemon - these are worth extra stardust ==
-        final List<String> stage1EvoName = Arrays.asList("Graveler", "Rhydon", "Poliwhirl", "Monferno",
-                "Combusken", "Porygon2", "Raichu", "Skiploom", "Loudred", "Umbreon", "Azumarill");
-        final List<String> stage2EvoName = Arrays.asList("Venusaur", "Charizard");
-        if(stage2EvoName.contains(pokemonName)) {
+        if(StardustValues.worth500.contains(pokemonName)) {
             stardustValue = 500;
-        } else if(stage1EvoName.contains(pokemonName)) {
+        } else if(StardustValues.worth300.contains(pokemonName)) {
             stardustValue = 300;
         } else {
             stardustValue = 100;
