@@ -2,9 +2,13 @@ package com.seanlubbers.stacker.model;
 
 import com.seanlubbers.stacker.rest.InvalidCpException;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.*;
+
+// PokemonReward needs to store the CP, the possible IVs for the given CP & Pokemon, the stardust value, and the basic Pokemon attributes such as
+// name, attack, defense, stamina, and pokedex number for serialization/deserialization. It does not need to calculate the possible IV combos, nor
+// does it need to calculate the possible CP values of the Pokemon at level 15. This is for storing the actual claimed reward only and not the
+// potential reward. We will save the Pokemon class for that.
 
 @Entity
 @Table(name="pokemon_rewards")

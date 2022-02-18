@@ -6,6 +6,11 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.*;
 
+// Pokemon does not need to care about/store the stardust value, the CP of the claimed reward, nor the possible IV range
+// of the claimed reward. It does need the standard Pokemon attributes as well as the list of possible CPs and IVs for
+// the Pokemon at level 15. This class is used for displaying the Pokemon to claim the reward. After claiming, it is then
+// saved as a PokemonReward.
+
 @Entity
 @Table(name="pokemon")
 public class Pokemon {
