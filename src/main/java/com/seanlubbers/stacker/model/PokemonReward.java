@@ -67,25 +67,25 @@ public class PokemonReward {
         } else {
             stardustValue = 100;
         }
-
+        calculatePossibleCPValues();
         calculateIvPercentagePerCP();
     }
 
     @PostLoad
     public void init() {
+        calculatePossibleCPValues();
         calculateIvPercentagePerCP();
     }
 
     // == private methods ==
 
-    // Calculate the list of possible CP values for this Pokemon based on level 15 with any of the IV values given.
+    // calculate the IV values of the given CP
+    // Maybe the list of CP values per Pokemon should be stored in the database?
     private void calculatePossibleCPValues() {
-        int CP;
-        List<IvValues> listOfIvValues;
         for(IvValues currentIVs : Pokemon.getIvList()) {
 
-            CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
-            listOfIvValues = new ArrayList<>();
+            int CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
+            List<IvValues> listOfIvValues = new ArrayList<>();
 
             if(!mapOfIvValues.isEmpty()) {
                 if(mapOfIvValues.containsKey(CP)) {

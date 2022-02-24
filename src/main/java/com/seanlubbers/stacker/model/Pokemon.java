@@ -28,6 +28,9 @@ public class Pokemon {
     @Transient
     private static List<IvValues> ivList = calculateListOfIVs();
 
+    @Transient
+    private Map<Integer, List<IvValues>> ivPercentageMap = new HashMap<>();
+
     public Pokemon() {
 
     }
@@ -62,10 +65,21 @@ public class Pokemon {
     }
 
     // Calculate the list of possible CP values for this Pokemon based on level 15 with any of the IV values given.
+    // At the same time, create a map with a key, value pair of the CP, list of possible IV combinations to generate
+    // a range for display later.
     private void calculatePossibleCPValues() {
         int CP;
         for(IvValues currentIVs : ivList) {
             CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
+            List<IvValues> listOfIvValues = new ArrayList<>();
+            if(!ivPercentageMap.isEmpty()) {
+                if(ivPercentageMap.containsKey(CP)) {
+                    listOfIvValues = ivPercentageMap.get(CP);
+                }
+            }
+            listOfIvValues.add(currentIVs);
+            listOfIvValues.sort(Comparator.comparingDouble(IvValues::getIvPercentage));
+            ivPercentageMap.put(CP, listOfIvValues);
             possibleCP.add(CP);
         }
     }
@@ -82,9 +96,13 @@ public class Pokemon {
         return possibleCP;
     }
 
+    public Map<Integer, List<IvValues>> getIvPercentageMap() {
+        return this.ivPercentageMap;
+    }
+
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return pokedex * 51;
     }
 
     @Override
