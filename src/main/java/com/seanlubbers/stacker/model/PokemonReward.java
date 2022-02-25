@@ -13,8 +13,6 @@ import javax.persistence.*;
 @Table(name="pokemon_rewards")
 public class PokemonReward {
 
-    // == field variables ==
-
     // == base variables ==
     private int CP;
     private String pokemonName;
@@ -39,24 +37,14 @@ public class PokemonReward {
 
         this.pokemonName = pokemon.getName();
         this.CP = CP;
-
-        if(StardustValues.worth500.contains(pokemonName)) {
-            stardustValue = 500;
-        } else if(StardustValues.worth300.contains(pokemonName)) {
-            stardustValue = 300;
-        } else {
-            stardustValue = 100;
-        }
-
+        setStardustValue();
         this.ivValuesPerCP = pokemon.getIvValuesPerCp(CP);
     }
 
     @PostLoad
     public void init() {
-
+        setStardustValue();
     }
-
-    // == private methods ==
 
     // == public methods ==
 
@@ -70,6 +58,16 @@ public class PokemonReward {
 
     public int getCP() {
         return CP;
+    }
+
+    public void setStardustValue() {
+        if(StardustValues.worth500.contains(pokemonName)) {
+            stardustValue = 500;
+        } else if(StardustValues.worth300.contains(pokemonName)) {
+            stardustValue = 300;
+        } else {
+            stardustValue = 100;
+        }
     }
 
     public boolean wasNotFound() {

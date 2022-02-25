@@ -2,10 +2,7 @@ package com.seanlubbers.stacker.model;
 
 import com.seanlubbers.stacker.rest.InvalidCpException;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.*;
 
 // Pokemon does not need to care about/store the stardust value, the CP of the claimed reward, nor the possible IV range
@@ -43,6 +40,11 @@ public class Pokemon {
         this.stamina = stamina;
         this.pokedex = pokedex;
         this.name = name;
+        calculatePossibleCPValues();
+    }
+
+    @PostLoad
+    public void init() {
         calculatePossibleCPValues();
     }
 
@@ -106,7 +108,7 @@ public class Pokemon {
         StringBuilder sb = new StringBuilder();
         List<IvValues> valuesPerCp;
 
-        if(!ivPercentageMap.containsKey(CP)){
+        if(!ivPercentageMap.containsKey(CP)) {
             throw new InvalidCpException("Invalid CP of " + CP + " for Pokemon " + name);
         } else {
             valuesPerCp = ivPercentageMap.get(CP);
