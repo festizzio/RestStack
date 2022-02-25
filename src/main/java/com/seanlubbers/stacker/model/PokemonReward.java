@@ -1,10 +1,8 @@
 package com.seanlubbers.stacker.model;
 
-import com.seanlubbers.stacker.rest.InvalidCpException;
 import com.seanlubbers.stacker.utils.StardustValues;
 
 import javax.persistence.*;
-import java.util.*;
 
 // PokemonReward needs to store the CP, the possible IVs for the given CP & Pokemon, the stardust value, and the basic Pokemon attributes such as
 // name, attack, defense, stamina, and pokedex number for serialization/deserialization. It does not need to calculate the possible IV combos, nor
@@ -49,6 +47,7 @@ public class PokemonReward {
         } else {
             stardustValue = 100;
         }
+
         this.ivValuesPerCP = pokemon.getIvValuesPerCp(CP);
     }
 
