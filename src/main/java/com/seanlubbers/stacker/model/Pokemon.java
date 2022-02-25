@@ -1,5 +1,7 @@
 package com.seanlubbers.stacker.model;
 
+import com.seanlubbers.stacker.rest.InvalidCpException;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -98,6 +100,24 @@ public class Pokemon {
 
     public Map<Integer, List<IvValues>> getIvPercentageMap() {
         return this.ivPercentageMap;
+    }
+
+    public String getIvValuesPerCp(int CP) {
+        StringBuilder sb = new StringBuilder();
+        List<IvValues> valuesPerCp;
+
+        if(!ivPercentageMap.containsKey(CP)){
+            throw new InvalidCpException("Invalid CP of " + CP + " for Pokemon " + name);
+        } else {
+            valuesPerCp = ivPercentageMap.get(CP);
+            sb.append(valuesPerCp.get(0).getIvPercentage());
+            if(!(valuesPerCp.get(0).getIvPercentage() == valuesPerCp.get(valuesPerCp.size() - 1).getIvPercentage())) {
+                sb.append("% - ");
+                sb.append(valuesPerCp.get(valuesPerCp.size() - 1).getIvPercentage());
+            }
+            sb.append("%");
+            return sb.toString();
+        }
     }
 
     @Override

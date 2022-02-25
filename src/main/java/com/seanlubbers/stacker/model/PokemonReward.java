@@ -18,24 +18,14 @@ public class PokemonReward {
     // == field variables ==
 
     // == base variables ==
-    private int baseAttack;
-    private int baseDefense;
-    private int baseStamina;
-    private int pokedexNumber;
     private int CP;
     private String pokemonName;
+    private String ivValuesPerCP;
+    @Transient private int stardustValue;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pokemonId;
-
-    @Transient
-    private String ivValuesPerCp;
-
-    @Transient
-    private int stardustValue;
-    @Transient
-    private Map<Integer, List<IvValues>> mapOfIvValues = new HashMap<>();
 
     // == constructors ==
 
@@ -48,16 +38,8 @@ public class PokemonReward {
     }
 
     public PokemonReward(Pokemon pokemon, int CP) {
-        this(pokemon.getPokedex(), pokemon.getName(), pokemon.getAttack(), pokemon.getDefense(), pokemon.getStamina(), CP);
-    }
 
-    public PokemonReward(int pokedexNumber, String pokemonName, int baseAttack, int baseDefense, int baseStamina, int CP) {
-
-        this.pokedexNumber = pokedexNumber;
-        this.pokemonName = pokemonName;
-        this.baseAttack = baseAttack;
-        this.baseDefense = baseDefense;
-        this.baseStamina = baseStamina;
+        this.pokemonName = pokemon.getName();
         this.CP = CP;
 
         if(StardustValues.worth500.contains(pokemonName)) {
@@ -67,65 +49,15 @@ public class PokemonReward {
         } else {
             stardustValue = 100;
         }
-        calculatePossibleCPValues();
-        calculateIvPercentagePerCP();
+        this.ivValuesPerCP = pokemon.getIvValuesPerCp(CP);
     }
 
     @PostLoad
     public void init() {
-        calculatePossibleCPValues();
-        calculateIvPercentagePerCP();
+
     }
 
     // == private methods ==
-
-    // calculate the IV values of the given CP
-    // Maybe the list of CP values per Pokemon should be stored in the database?
-    private void calculatePossibleCPValues() {
-        for(IvValues currentIVs : Pokemon.getIvList()) {
-
-            int CP = calculateCP(currentIVs.getAttackIV(), currentIVs.getDefenseIV(), currentIVs.getStaminaIV());
-            List<IvValues> listOfIvValues = new ArrayList<>();
-
-            if(!mapOfIvValues.isEmpty()) {
-                if(mapOfIvValues.containsKey(CP)) {
-                    listOfIvValues = mapOfIvValues.get(CP);
-                }
-            }
-
-            listOfIvValues.add(currentIVs);
-
-            listOfIvValues.sort(Comparator.comparingDouble(IvValues::getIvPercentage));
-            mapOfIvValues.put(CP, listOfIvValues);
-        }
-    }
-
-    private int calculateCP(int attackIV, int defenseIV, int staminaIV) {
-        // Formula to calculate the CP of a Pokemon based on its known IVs and level per gamepress.gg.
-        // The arbitrary CP multiplier for level 15 (the level of all research rewards) is 0.51739395.
-        // https://gamepress.gg/pokemongo/cp-multiplier
-        return (int) ((baseAttack + attackIV) * Math.pow((baseDefense + defenseIV), 0.5) *
-                Math.pow((baseStamina + staminaIV), 0.5) * Math.pow(0.51739395, 2)) / 10;
-    }
-
-    // For each CP, there are several different possibilities for IV percentages. This sets the range.
-    public void calculateIvPercentagePerCP() {
-        StringBuilder sb = new StringBuilder();
-        List<IvValues> valuesPerCp;
-
-        if(!mapOfIvValues.containsKey(CP)){
-            throw new InvalidCpException("Invalid CP of " + CP + " for Pokemon " + pokemonName);
-        } else {
-            valuesPerCp = mapOfIvValues.get(CP);
-            sb.append(valuesPerCp.get(0).getIvPercentage());
-            if(!(valuesPerCp.get(0).getIvPercentage() == valuesPerCp.get(valuesPerCp.size() - 1).getIvPercentage())) {
-                sb.append("% - ");
-                sb.append(valuesPerCp.get(valuesPerCp.size() - 1).getIvPercentage());
-            }
-            sb.append("%");
-            this.ivValuesPerCp = sb.toString();
-        }
-    }
 
     // == public methods ==
 
@@ -139,26 +71,6 @@ public class PokemonReward {
 
     public int getCP() {
         return CP;
-    }
-
-    public int getPokedexNumber() {
-        return this.pokedexNumber;
-    }
-
-    public int getBaseAttack() {
-        return baseAttack;
-    }
-
-    public int getBaseDefense() {
-        return baseDefense;
-    }
-
-    public int getBaseStamina() {
-        return baseStamina;
-    }
-
-    public String getIvValuesPerCp() {
-        return this.ivValuesPerCp;
     }
 
     public boolean wasNotFound() {
