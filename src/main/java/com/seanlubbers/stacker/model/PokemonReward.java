@@ -60,6 +60,10 @@ public class PokemonReward {
         return CP;
     }
 
+    public String getIvValuesPerCP() {
+        return ivValuesPerCP;
+    }
+
     public void setStardustValue() {
         if(StardustValues.worth500.contains(pokemonName)) {
             stardustValue = 500;

@@ -44,21 +44,15 @@ public class PokemonRestController {
         }
         return thePokemon;
     }
-
-    @PostMapping("/pokemon_rewards")
-    public void addRewardToTable(@RequestBody String pokemonName, @RequestBody int CP) {
-        PokemonReward pokemon = new PokemonReward(pokemonService.getPokemon(pokemonName), CP);
-        pokemonRewardService.addReward(pokemon);
-    }
-
-    @PostMapping("/pokemon/{pokemonName}")
-    public String addPokemon(@PathVariable String pokemonName) {
-        PokemonSqlite.getInstance().open();
-        Pokemon pokemon = PokemonSqlite.getInstance().getPokemonMap().get(pokemonName);
-        System.out.println(pokemon);
-        pokemonService.savePokemon(pokemon);
-        return "Successfully added " + pokemonName + " to the MySQL database from SQLite.";
-    }
+//
+//    @PostMapping("/pokemon/{pokemonName}")
+//    public String addPokemon(@PathVariable String pokemonName) {
+//        PokemonSqlite.getInstance().open();
+//        Pokemon pokemon = PokemonSqlite.getInstance().getPokemonMap().get(pokemonName);
+//        System.out.println(pokemon);
+//        pokemonService.savePokemon(pokemon);
+//        return "Successfully added " + pokemonName + " to the MySQL database from SQLite.";
+//    }
 
     @PostMapping("/pokemon/stack/{pokemonName}/{CP}")
     public PokemonReward addStackPokemon(@PathVariable String pokemonName, @PathVariable int CP) {
