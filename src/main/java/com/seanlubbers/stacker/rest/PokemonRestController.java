@@ -66,4 +66,11 @@ public class PokemonRestController {
         return pokemonRewardService.getRewards();
     }
 
+    // Method to check IVs of any research Pokemon (i.e. level 20 Pokemon with IV floor of 10/10/10
+    @GetMapping("/pokemon/IVs/{name}/{CP}")
+    public PokemonReward getIVs(@PathVariable String name, @PathVariable int CP) {
+        PokemonReward pokemonReward = new PokemonReward(pokemonService.getPokemon(name), CP);
+        return pokemonReward;
+    }
+
 }
